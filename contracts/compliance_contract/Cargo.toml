@@ -1,0 +1,28 @@
+[package]
+name = "compliance_contract_cw"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+description = "Compliance Contract for CW-3643 - enforces transfer rules and regulatory requirements"
+repository.workspace = true
+license.workspace = true
+keywords = ["cosmwasm", "cw3643", "compliance", "regulation", "security-token"]
+categories = ["cryptography::cryptocurrencies"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+library = []
+
+[dependencies]
+cosmwasm-std.workspace = true
+cosmwasm-schema.workspace = true
+cw-storage-plus.workspace = true
+cw2.workspace = true
+schemars.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+cw-multi-test.workspace = true

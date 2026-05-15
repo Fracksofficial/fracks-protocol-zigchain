@@ -1,0 +1,28 @@
+[package]
+name = "onchainid_cw"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+description = "OnChainID implementation for CW-3643 - manages digital identity claims on-chain"
+repository.workspace = true
+license.workspace = true
+keywords = ["cosmwasm", "cw3643", "identity", "claims", "did"]
+categories = ["cryptography::cryptocurrencies"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+library = []
+
+[dependencies]
+cosmwasm-std.workspace = true
+cosmwasm-schema.workspace = true
+cw-storage-plus.workspace = true
+cw2.workspace = true
+schemars.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+cw-multi-test.workspace = true

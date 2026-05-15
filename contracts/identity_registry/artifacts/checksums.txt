@@ -1,0 +1,1 @@
+eb4893b4ae7a8f9ffea93e3079a0cdba5c2ed2b2322b046183819d9974d1c9d6  identity_registry_cw.wasm

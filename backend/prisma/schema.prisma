@@ -1,0 +1,259 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  walletAddress String?  @unique
+  roles         String[]
+  requestedRole String?
+  roleStatus    String   @default("PENDING")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions      Session[]
+}
+
+model Session {
+  id               String   @id @default(uuid())
+  userId           String
+  refreshTokenHash String
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Asset {
+  id             String   @id @default(uuid())
+  factoryAssetId Int?
+  tokenContract  String   @unique
+  referenceId    String?
+  name           String
+  symbol         String
+  description    String?
+  issuerWallet   String?
+  legalOwner     String?
+  metadata       Json?
+  deployedAt     DateTime?
+  lifecycleState String   @default("ISSUED")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model TokenState {
+  id           String   @id @default(uuid())
+  tokenContract String @unique
+  name         String
+  symbol       String
+  decimals     Int
+  totalSupply  String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model TokenAsset {
+  id           String   @id @default(uuid())
+  tokenContract String
+  assetId      Int
+  referenceId  String
+  description  String
+  legalOwner   String
+  metadata     Json?
+  totalTokenized String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([tokenContract, assetId])
+}
+
+model TokenBalance {
+  id            String   @id @default(uuid())
+  tokenContract String
+  walletAddress String
+  balance       String
+  updatedAt     DateTime @updatedAt
+
+  @@unique([tokenContract, walletAddress])
+}
+
+model IssuanceRequest {
+  id             String    @id @default(uuid())
+  requestId      Int       // On-chain request ID
+  tokenContract  String
+  assetId        Int
+  recipient      String
+  amount         String
+  requester      String
+  status         String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  reason         String?
+  txHash         String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  
+  // Approval fields
+  approvedAt     DateTime?
+  approvedBy     String?
+  
+  // Rejection fields
+  rejectedAt     DateTime?
+  rejectedBy     String?
+  rejectionReason String?
+  
+  @@unique([tokenContract, requestId])
+  @@index([tokenContract])
+  @@index([status])
+  @@index([requester])
+  @@index([recipient])
+}
+
+model RedemptionRequest {
+  id              String    @id @default(uuid())
+  requestId       Int       // On-chain request ID
+  tokenContract   String
+  assetId         Int
+  requester       String
+  amount          String
+  reason          String?
+  status          String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  txHash          String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Approval fields
+  approvedAt      DateTime?
+  approvedBy      String?
+  
+  // Rejection fields
+  rejectedAt      DateTime?
+  rejectedBy      String?
+  rejectionReason String?
+  
+  @@unique([tokenContract, requestId])
+  @@index([tokenContract])
+  @@index([status])
+  @@index([requester])
+}
+
+model ComplianceRule {
+  id               String   @id @default(uuid())
+  allowedCountries String[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model TransferLimit {
+  id        String   @id @default(uuid())
+  address   String   @unique
+  limit     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TrackedWallet {
+  id           String   @id @default(uuid())
+  walletAddress String  @unique
+  label        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model IndexerState {
+  id        String   @id @default(uuid())
+  status    String
+  error     String?
+  lastRunAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ActivityLog {
+  id          String   @id @default(uuid())
+  actionType  String
+  actorUserId String?
+  actorWallet String?
+  entityType  String?
+  entityId    String?
+  assetId     String?
+  oldValue    Json?
+  newValue    Json?
+  reason      String?
+  txHash      String?
+  createdAt   DateTime @default(now())
+}
+
+model IdentitySnapshot {
+  id          String   @id @default(uuid())
+  wallet      String
+  claimTopics String[]
+  verified    Boolean  @default(false)
+  country     String?
+  createdAt   DateTime @default(now())
+}
+
+model KycApplication {
+  id                String   @id @default(uuid())
+  walletAddress     String   @unique
+  email             String?
+  fullName          String
+  dateOfBirth       String?
+  nationality       String
+  country           String
+  addressLine1      String
+  addressLine2      String?
+  city              String
+  state             String?
+  postalCode        String
+  phoneNumber       String?
+  
+  // Document references
+  idDocumentUrl     String?
+  proofOfAddressUrl String?
+  selfieUrl         String?
+  
+  // Application status
+  status            String   @default("PENDING") // PENDING | APPROVED | REJECTED | UNDER_REVIEW
+  submittedAt       DateTime @default(now())
+  reviewedAt        DateTime?
+  reviewedBy        String?
+  rejectionReason   String?
+  
+  // OnchainID tracking
+  onchainIdAddress  String?
+  onchainIdCreated  Boolean  @default(false)
+  
+  // Metadata
+  notes             String?
+  riskScore         Int?     // 0-100
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([walletAddress])
+  @@index([status])
+  @@index([submittedAt])
+}
+
+model KycDocument {
+  id              String   @id @default(uuid())
+  applicationId   String
+  documentType    String   // ID_CARD | PASSPORT | DRIVERS_LICENSE | PROOF_OF_ADDRESS | SELFIE
+  fileName        String
+  fileUrl         String
+  fileSize        Int
+  mimeType        String
+  uploadedAt      DateTime @default(now())
+  verified        Boolean  @default(false)
+  verifiedBy      String?
+  verifiedAt      DateTime?
+  
+  @@index([applicationId])
+}
+

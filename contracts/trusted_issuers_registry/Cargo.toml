@@ -1,0 +1,28 @@
+[package]
+name = "trusted_issuers_registry_cw"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+description = "Trusted Issuers Registry for CW-3643 - maintains whitelist of authorized claim issuers"
+repository.workspace = true
+license.workspace = true
+keywords = ["cosmwasm", "cw3643", "issuers", "claims", "trust"]
+categories = ["cryptography::cryptocurrencies"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+library = []
+
+[dependencies]
+cosmwasm-std.workspace = true
+cosmwasm-schema.workspace = true
+cw-storage-plus.workspace = true
+cw2.workspace = true
+schemars.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+cw-multi-test.workspace = true

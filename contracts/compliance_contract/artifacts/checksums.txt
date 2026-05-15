@@ -1,0 +1,1 @@
+27a029f8f9ad6e510a1bdf20f2e5d6037b6582d623a735d848af781ddc3fd9a2  compliance_contract_cw.wasm

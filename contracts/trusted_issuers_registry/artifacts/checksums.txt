@@ -1,0 +1,1 @@
+552b5d30134b0664e694750f2b77e5e7c339afb9a72d6c7c0cd2a96114391851  trusted_issuers_registry_cw.wasm

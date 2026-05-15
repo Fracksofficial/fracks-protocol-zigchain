@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/prisma/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  walletAddress String?  @unique
+  roles         String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions Session[]
+}
+
+model Session {
+  id               String   @id @default(uuid())
+  userId           String
+  refreshTokenHash String
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Asset {
+  id             String   @id @default(uuid())
+  factoryAssetId Int?
+  tokenContract  String
+  name           String
+  symbol         String
+  issuerWallet   String?
+  legalOwner     String?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model IssuanceRequest {
+  id            String   @id @default(uuid())
+  tokenContract String
+  assetId       String
+  recipient     String
+  amount        String
+  status        String   @default("PENDING")
+  txHash        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model RedemptionRequest {
+  id            String   @id @default(uuid())
+  tokenContract String
+  assetId       String
+  requester     String
+  amount        String
+  reason        String?
+  status        String   @default("PENDING")
+  txHash        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ComplianceRule {
+  id               String   @id @default(uuid())
+  allowedCountries String[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model TransferLimit {
+  id        String   @id @default(uuid())
+  address   String   @unique
+  limit     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

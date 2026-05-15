@@ -1,0 +1,87 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: rwa-db
+    restart: always
+    command: ["postgres", "-p", "5082"]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-1234}
+      POSTGRES_DB: ${DB_NAME:-rwaPlatformDB}
+    ports:
+      - "5082:5082"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -p 5082"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rwa-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    container_name: rwa-backend
+    restart: always
+    env_file:
+      - .env.docker
+    environment:
+      - NODE_ENV=development
+      - PORT=5080
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-1234}@db:5082/${DB_NAME:-rwaPlatformDB}?schema=public
+    ports:
+      - "5080:5080"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "npx prisma migrate deploy && npx ts-node -r tsconfig-paths/register src/main.ts"
+    networks:
+      - rwa-network
+
+  indexer:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    container_name: rwa-indexer
+    restart: always
+    env_file:
+      - .env.docker
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-1234}@db:5082/${DB_NAME:-rwaPlatformDB}?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    command: pnpm indexer:dev
+    networks:
+      - rwa-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    container_name: rwa-frontend
+    restart: always
+    env_file:
+      - ./frontend/.env.docker
+    environment:
+      - PORT=5081
+    ports:
+      - "5081:5081"
+    depends_on:
+      - backend
+    networks:
+      - rwa-network
+
+networks:
+  rwa-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

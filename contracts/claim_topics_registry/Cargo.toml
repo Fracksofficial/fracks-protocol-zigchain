@@ -1,0 +1,28 @@
+[package]
+name = "claim_topics_registry_cw"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+description = "Claim Topics Registry for CW-3643 - defines required claim topics for token transfers"
+repository.workspace = true
+license.workspace = true
+keywords = ["cosmwasm", "cw3643", "claims", "topics", "registry"]
+categories = ["cryptography::cryptocurrencies"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+library = []
+
+[dependencies]
+cosmwasm-std.workspace = true
+cosmwasm-schema.workspace = true
+cw-storage-plus.workspace = true
+cw2.workspace = true
+schemars.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+cw-multi-test.workspace = true
