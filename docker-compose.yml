@@ -53,6 +53,8 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-1234}@db:5082/${DB_NAME:-rwaPlatformDB}?schema=public
+    ports:
+      - "5083:5083"
     depends_on:
       db:
         condition: service_healthy
