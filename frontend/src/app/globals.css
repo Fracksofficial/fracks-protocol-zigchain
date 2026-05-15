@@ -94,7 +94,7 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-  --font-sans: var(--font-public-sans);
+  --font-sans: "Public Sans", system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 

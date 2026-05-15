@@ -5,6 +5,11 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
+ARG NEXT_PUBLIC_BACKEND_URL=https://zigchain-api.fracks.xyz
+ARG NEXT_PUBLIC_SITE_URL=https://zigchain.fracks.xyz
+ENV NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+
 # Copy package files
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
 
@@ -13,6 +18,8 @@ RUN pnpm install --ignore-scripts
 
 # Copy the rest of the frontend application code
 COPY frontend/ .
+
+RUN pnpm build
 
 # Expose the port the app runs on
 EXPOSE 5081
