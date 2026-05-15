@@ -18,4 +18,4 @@ COPY frontend/ .
 EXPOSE 5081
 
 # Start the application
-CMD ["pnpm", "run", "dev", "--", "-p", "5081"]
+CMD ["pnpm", "run", "dev"]
