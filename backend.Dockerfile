@@ -13,6 +13,9 @@ RUN pnpm install --ignore-scripts
 
 # Copy prisma schema and generate client explicitly
 COPY backend/prisma ./prisma
+RUN test -f prisma/schema.prisma && \
+    test -d prisma/migrations && \
+    find prisma/migrations -mindepth 2 -name migration.sql | grep -q .
 RUN npx prisma generate
 
 # Copy the rest of the backend application code

@@ -3,17 +3,16 @@ services:
     image: postgres:16-alpine
     container_name: rwa-db
     restart: always
-    command: ["postgres", "-p", "5082"]
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD:-1234}
       POSTGRES_DB: ${DB_NAME:-rwaPlatformDB}
     ports:
-      - "5082:5082"
+      - "5082:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -p 5082"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -31,7 +30,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=5080
-      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-1234}@db:5082/${DB_NAME:-rwaPlatformDB}?schema=public
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-1234}@db:5432/${DB_NAME:-rwaPlatformDB}?schema=public
     ports:
       - "5080:5080"
     depends_on:
@@ -52,7 +51,7 @@ services:
       - .env.docker
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-1234}@db:5082/${DB_NAME:-rwaPlatformDB}?schema=public
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-1234}@db:5432/${DB_NAME:-rwaPlatformDB}?schema=public
     ports:
       - "5083:5083"
     depends_on:
